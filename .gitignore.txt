@@ -1,0 +1,6 @@
+```ini
+   __pycache__/
+   *.py[cod]
+   *.log
+   .vscode/
+   .idea/
