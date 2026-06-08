@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Mis Snippets Personalizados',
-    'summary': 'Snippets a medida para el editor web de Odoo 17',
+    'summary': 'Estructuras de Contador, Cinta de Anuncios y Progreso de Envío Gratis',
     'category': 'Website',
-    'version': '17.0.1.0.2',  # Subimos la versión para forzar a Odoo a leerlo de cero
-    'depends': ['base', 'website'],
+    'version': '17.0.5.0.0',
+    'depends': ['base', 'website', 'website_sale'], # Añadimos website_sale porque interactúa con la tienda
     'data': [
         'views/snippets.xml',
     ],
+    'assets': {
+        'web.assets_frontend': [
+            'custom_snippets/static/src/js/free_shipping_bar.js',
+        ],
+    },
     'installable': True,
     'application': False,
-    'auto_install': False,
     'license': 'LGPL-3',
 }
