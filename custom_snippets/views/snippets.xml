@@ -1,30 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <template id="s_custom_banner" name="Banner Promocional Custom">
-            <section class="s_custom_banner o_colored_level pt64 pb64 bg-100" data-snippet="s_custom_banner">
+        <template id="s_countdown_desktop" name="Contador Regresivo Desktop">
+            <section class="s_countdown_desktop o_colored_level pt48 pb48 bg-900 text-white d-none d-lg-block" 
+                     data-snippet="s_countdown_desktop">
                 <div class="container">
                     <div class="row align-items-center">
-                        <div class="col-lg-6">
-                            <h2 class="display-4 fw-bold text-primary">Nueva Colección</h2>
-                            <p class="lead text-muted">
-                                Diseño minimalista pensado para el entorno profesional moderno.
-                            </p>
-                            <a href="/shop" class="btn btn-primary btn-lg rounded-pill px-4">Ver Catálogo</a>
+                        <div class="col-lg-5">
+                            <span class="badge bg-danger mb-2">¡OFERTA RELÁMPAGO!</span>
+                            <h2 class="fw-bold">Grandes Descuentos Tecnológicos</h2>
+                            <p class="text-muted">La oferta termina en cuanto el reloj llegue a cero.</p>
                         </div>
-                        <div class="col-lg-6 text-center">
-                            <img src="/web/static/img/placeholder.png" class="img img-fluid mx-auto" style="max-height: 350px;" alt="Promo Image"/>
+                        
+                        <div class="col-lg-5">
+                            <t t-call="website.s_countdown"/>
+                        </div>
+                        
+                        <div class="col-lg-2 text-end">
+                            <a href="/shop" class="btn btn-primary btn-lg rounded-pill px-4">Comprar Ya</a>
                         </div>
                     </div>
                 </div>
             </section>
         </template>
 
-        <template id="external_snippets_inherit" inherit_id="website.snippets" name="Custom Snippets Block">
-            <xpath expr="//div[@id='snippet_structure']//div[@class='o_panel_body']" position="inside">
-                <t t-snippet="custom_snippets.s_custom_banner" 
-                   t-string="Mi Banner Custom"/>
+        <template id="s_countdown_mobile" name="Contador Regresivo Móvil">
+            <section class="s_countdown_mobile o_colored_level pt32 pb32 bg-900 text-white text-center d-block d-lg-none" 
+                     data-snippet="s_countdown_mobile">
+                <div class="container">
+                    <span class="badge bg-danger mb-2">¡OFERTA RELÁMPAGO!</span>
+                    <h3 class="fw-bold fs-4">Descuentos en tu Móvil</h3>
+                    
+                    <div class="my32">
+                        <t t-call="website.s_countdown"/>
+                    </div>
+                    
+                    <a href="/shop" class="btn btn-primary rounded-pill w-100 py-2">Aprovechar Oferta</a>
+                </div>
+            </section>
+        </template>
+
+        <template id="external_snippets_inherit" inherit_id="website.snippets" name="Custom Countdown Snippets">
+            <xpath expr="//div[@id='o_scroll']" position="inside">
+                <div class="o_panel">
+                    <div class="o_panel_header">Banners y Carousel</div>
+                    <div class="o_panel_body">
+                        <t t-snippet="custom_snippets.s_countdown_desktop" t-string="Contador (Desktop)"/>
+                        <t t-snippet="custom_snippets.s_countdown_mobile" t-string="Contador (Móvil)"/>
+                    </div>
+                </div>
             </xpath>
         </template>
+
+<!-- nuevo bloque de texto Cinta de Anuncios Rotativa-->
+<template id="s_notification_bar" name="Cinta de Anuncios Rotativa">
+        <section class="s_notification_bar bg-900 text-white py-2" data-snippet="s_notification_bar" style="font-size: 13px; letter-spacing: 0.5px;">
+            <div class="container-fluid">
+                <div id="notificationCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
+                    <div class="carousel-inner text-center">
+                        
+                        <div class="carousel-item active">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <span class="fa fa-truck text-warning"></span>
+                                <span>Envíos <strong>gratis</strong> a nivel nacional por compras mayores a RD$5,000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <span class="fa fa-shield text-info"></span>
+                                <span>Garantía local de <strong>1 año</strong> en todos nuestros equipos tecnológicos</span>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <span class="fa fa-credit-card text-success"></span>
+                                <span>Hasta <strong>12 cuotas sin intereses</strong> con tarjetas de crédito participantes</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+    <template id="external_snippets_inherit" inherit_id="website.snippets" name="Custom Countdown Snippets">
+        <xpath expr="//div[@id='o_scroll']" position="inside">
+            <div class="o_panel">
+                <div class="o_panel_header">Banners y Carousel</div>
+                <div class="o_panel_body">
+                    <t t-snippet="custom_snippets.s_notification_bar" t-string="Cinta de Anuncios"/>
+                    <t t-snippet="custom_snippets.s_countdown_desktop" t-string="Contador (Desktop)"/>
+                    <t t-snippet="custom_snippets.s_countdown_mobile" t-string="Contador (Móvil)"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+        
     </data>
 </odoo>
