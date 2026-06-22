@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="custom_dashboard.EcommerceDashboardView">
+        <div class="o_dashboards p-4 bg-light" style="height: 100%; overflow-y: auto; font-family: 'Segoe UI', system-ui, sans-serif;">
+            
+            <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom bg-white p-3 rounded-3 shadow-sm">
+                <div>
+                    <h2 class="fw-bold text-dark m-0"><span class="fa fa-line-chart me-2 text-primary"></span>Control BI Omnicanal</h2>
+                    <p class="text-muted m-0">Análisis integrado de ventas, inventario crítico y logística de distribución</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <select class="form-select border-2 fw-semibold text-dark" t-on-change="onDateFilterChange" t-model="state.filters.date">
+                        <option value="all">📅 Todo el Historial</option>
+                        <option value="today">📅 Hoy</option>
+                        <option value="this_month">📅 Este Mes</option>
+                        <option value="this_year">📅 Año Actual</option>
+                    </select>
+                    <select class="form-select border-2 fw-semibold text-dark" t-on-change="onPartnerFilterChange" t-model="state.filters.partner" style="min-width: 200px;">
+                        <option value="">👤 Todos los Clientes</option>
+                        <t t-foreach="state.kpis.partners_available" t-as="partner" t-key="partner.id">
+                            <option t-att-value="partner.id"><t t-esc="partner.name"/></option>
+                        </t>
+                    </select>
+                </div>
+            </div>
+
+            <ul class="nav nav-pills mb-4 bg-white p-2 rounded-3 shadow-sm gap-2">
+                <li class="nav-item">
+                    <button t-attf-class="nav-link fw-bold px-4 rounded-pill #{state.activeTab == 'financial' ? 'active' : ''}" 
+                            t-on-click="() => this.changeTab('financial')">
+                        <span class="fa fa-money me-2"></span>Finanzas &amp; Canales
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button t-attf-class="nav-link fw-bold px-4 rounded-pill #{state.activeTab == 'marketing' ? 'active' : ''}" 
+                            t-on-click="() => this.changeTab('marketing')">
+                        <span class="fa fa-shopping-cart me-2"></span>E-commerce &amp; Conversión
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button t-attf-class="nav-link fw-bold px-4 rounded-pill #{state.activeTab == 'logistics' ? 'active' : ''}" 
+                            t-on-click="() => this.changeTab('logistics')">
+                        <span class="fa fa-truck me-2"></span>Logística &amp; Stock 
+                        <span t-if="state.kpis.low_stock_count > 0" class="badge bg-danger ms-2"><t t-esc="state.kpis.low_stock_count"/></span>
+                    </button>
+                </li>
+            </ul>
+
+            <div t-if="state.activeTab == 'financial'">
+                <div class="row g-4 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 bg-white p-4 border-start border-primary border-4"
+                 style="cursor: pointer; transition: transform 0.2s;" t-on-click="openOrdersAction"
+                 onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase fw-semibold mb-1 small">Monto Total Facturado</p>
+                        <h3 class="fw-bold text-dark mb-1">RD$ <t t-esc="state.kpis.total_sales.toLocaleString('en-US', {minimumFractionDigits: 2})"/></h3>
+                        <span class="text-primary fw-bold small" style="font-size: 0.75rem;"><span class="fa fa-eye me-1"></span>Ver órdenes</span>
+                    </div>
+                    <span class="fa fa-line-chart text-primary fa-2x bg-light p-3 rounded-circle"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 bg-white p-4 border-start border-danger border-4"
+                 style="cursor: pointer; transition: transform 0.2s;" t-on-click="openRefundsAction"
+                 onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase fw-semibold mb-1 small">Devoluciones (NC)</p>
+                        <h3 class="fw-bold text-danger mb-1">RD$ <t t-esc="state.kpis.total_refunds.toLocaleString('en-US', {minimumFractionDigits: 2})"/></h3>
+                        <span class="text-danger fw-bold small" style="font-size: 0.75rem;"><span class="fa fa-eye me-1"></span>Ver notas de crédito</span>
+                    </div>
+                    <span class="fa fa-minus-square text-danger fa-2x bg-light p-3 rounded-circle"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 bg-white p-4 border-start border-success border-4"
+                 style="cursor: pointer; transition: transform 0.2s;" t-on-click="openOrdersAction"
+                 onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase fw-semibold mb-1 small">Ventas Netas</p>
+                        <h3 class="fw-bold text-success mb-1">RD$ <t t-esc="state.kpis.net_sales.toLocaleString('en-US', {minimumFractionDigits: 2})"/></h3>
+                        <span class="text-success fw-bold small" style="font-size: 0.75rem;"><span class="fa fa-eye me-1"></span>Auditar neto</span>
+                    </div>
+                    <span class="fa fa-money text-success fa-2x bg-light p-3 rounded-circle"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm rounded-3 bg-white p-4 border-start border-warning border-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted text-uppercase fw-semibold mb-1 small">Valor Promedio Compra</p>
+                        <h3 class="fw-bold text-dark mb-1">RD$ <t t-esc="state.kpis.average_ticket.toLocaleString('en-US', {minimumFractionDigits: 2})"/></h3>
+                        <span class="text-muted small" style="font-size: 0.75rem;">Métrica basada en órdenes</span>
+                    </div>
+                    <span class="fa fa-calculator text-warning fa-2x bg-light p-3 rounded-circle"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3 bg-white p-4 h-100">
+                <h5 class="fw-bold text-dark mb-4"><span class="fa fa-users text-primary me-2"></span>Rendimiento por Canal / Equipos</h5>
+                <div class="d-flex flex-column gap-4">
+                    <t t-foreach="state.kpis.sales_channels" t-as="channel" t-key="channel.name">
+                        <div>
+                            <div class="d-flex justify-content-between mb-1 fw-semibold text-dark small">
+                                <span><t t-esc="channel.name"/></span>
+                                <span>RD$ <t t-esc="channel.revenue.toLocaleString('en-US', {minimumFractionDigits: 2})"/></span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-primary" role="progressbar" t-att-style="'width: ' + channel.percentage + '%'"></div >
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3 bg-white p-4 h-100">
+                <h5 class="fw-bold text-dark mb-3"><span class="fa fa-trophy text-warning me-2"></span>Clientes de Mayor Impacto</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead class="text-muted small text-uppercase" style="background-color: #f8f9fa;">
+                            <tr>
+                                <th class="p-3">Cliente</th>
+                                <th class="p-3 text-center">Órdenes</th>
+                                <th class="p-3 text-end">Total Facturado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small fw-semibold text-dark">
+                            <t t-foreach="state.kpis.top_customers" t-as="customer" t-key="customer.id">
+                                <tr class="border-bottom border-light">
+                                    <td class="p-3"><t t-esc="customer.name"/></td>
+                                    <td class="p-3 text-center"><span class="badge bg-light text-dark px-3 py-2 rounded-pill"><t t-esc="customer.qty"/></span></td>
+                                    <td class="p-3 text-end text-primary">RD$ <t t-esc="customer.spent.toLocaleString('en-US', {minimumFractionDigits: 2})"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                
+            </div>
+
+            <div t-if="state.activeTab == 'marketing'">
+                <div class="row g-4 mb-4">
+                    <!-- Tarjeta 1: Tasa de Conversión -->
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-3 bg-white p-4 h-100 text-center">
+                            <p class="text-muted text-uppercase fw-bold mb-1 small">Embudo de Conversión</p>
+                            <h2 class="fw-bold text-success my-2"><t t-esc="state.kpis.conversion_rate.toFixed(2)"/>%</h2>
+                            <div class="progress mx-auto w-100" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" t-att-style="'width: ' + state.kpis.conversion_rate + '%'"></div >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 2: Tasa de Recurrencia -->
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-3 bg-white p-4 h-100 text-center">
+                            <p class="text-muted text-uppercase fw-bold mb-1 small">Fidelización (Recompra)</p>
+                            <h2 class="fw-bold text-info my-2"><t t-esc="state.kpis.recurrence_rate.toFixed(2)"/>%</h2>
+                            <div class="progress mx-auto w-100" style="height: 6px;">
+                                <div class="progress-bar bg-info" role="progressbar" t-att-style="'width: ' + state.kpis.recurrence_rate + '%'"></div >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta 3: Cantidad de Carritos Abandonados -->
+                    <div class="col-12 col-md-6 col-xl-3">
+    <div class="card border-0 shadow-sm rounded-3 bg-white p-4 h-100 d-flex flex-column justify-content-center border-start border-danger border-4"
+         style="cursor: pointer; transition: transform 0.2s;" t-on-click="openAbandonedCartsAction"
+         onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <p class="text-muted text-uppercase fw-semibold mb-1 small">Carritos Abandonados</p>
+        <h3 class="fw-bold text-danger mb-0"><t t-esc="state.kpis.abandoned_carts"/> carritos</h3>
+        <span class="text-danger tiny fw-bold small mt-1" style="font-size: 0.75rem;"><span class="fa fa-mail-forward me-1"></span>Ver carritos para recuperar</span>
+    </div>
+</div>
+
+<!-- Tarjeta 4: Dinero en Riesgo en Carritos -->
+<div class="col-12 col-md-6 col-xl-3">
+    <div class="card border-0 shadow-sm rounded-3 bg-white p-4 h-100 d-flex flex-column justify-content-center border-start border-warning border-4"
+         style="cursor: pointer; transition: transform 0.2s;" t-on-click="openAbandonedCartsAction"
+         onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <p class="text-muted text-uppercase fw-semibold mb-1 small">Ingreso en Riesgo / Web</p>
+        <h3 class="fw-bold text-dark mb-0">RD$ <t t-esc="state.kpis.total_abandoned_revenue.toLocaleString('en-US', {minimumFractionDigits: 2})"/></h3>
+        <span class="text-warning tiny fw-bold small mt-1" style="font-size: 0.75rem;"><span class="fa fa-dollar me-1"></span>Revisar cotizaciones web</span>
+    </div>
+</div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-3 bg-white p-4">
+                    <h5 class="fw-bold text-dark mb-3"><span class="fa fa-fire text-danger me-2"></span>Catálogo de Alta Rotación (Top Productos)</h5>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Modelo / Descripción</th>
+                                <th class="text-center">Unidades Colocadas</th>
+                                <th class="text-end">Ingresos Brutos por Producto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.kpis.top_products" t-as="p" t-key="p.id">
+                                <tr>
+                                    <td class="fw-semibold text-dark"><t t-esc="p.name"/></td>
+                                    <td class="text-center text-muted fw-bold"><t t-esc="p.qty"/> u</td>
+                                    <td class="text-end fw-bold text-success">RD$ <t t-esc="p.amount.toLocaleString('en-US')"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ================= PESTAÑA 3: LOGÍSTICA & STOCK ================= -->
+            <div t-if="state.activeTab == 'logistics'">
+                <div class="row g-4 mb-4">
+                    
+                    <!-- Tarjeta Interactiva: Despachos Pendientes -->
+                    <div class="col-12 col-md-6">
+                        <div class="card border-0 shadow-sm rounded-3 bg-white p-4 border-start border-warning border-4 st-clickable" 
+                             style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+                             t-on-click="openPendingDeliveriesAction"
+                             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0.5rem 1rem rgba(0,0,0,0.15)';"
+                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="text-muted text-uppercase fw-semibold mb-1 small">Despachos Pendientes en Almacén</h5>
+                                    <h2 class="fw-bold text-dark mb-0"><t t-esc="state.kpis.pending_delivery"/> Por Enviar</h2>
+                                    <span class="text-primary small fw-bold"><span class="fa fa-arrow-right me-1"></span>Ver pedidos pendientes</span>
+                                </div>
+                                <span class="fa fa-truck text-warning fa-3x bg-light p-3 rounded-circle"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Interactiva: Quiebre de Stock -->
+                    <div class="col-12 col-md-6">
+                        <div class="card border-0 shadow-sm rounded-3 bg-white p-4 border-start border-danger border-4 st-clickable"
+                             style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;"
+                             t-on-click="openLowStockAction"
+                             onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0.5rem 1rem rgba(0,0,0,0.15)';"
+                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="text-muted text-uppercase fw-semibold mb-1 small">Quiebre de Stock (Variantes en Cero)</h5>
+                                    <h2 class="fw-bold text-danger mb-0"><t t-esc="state.kpis.low_stock_count"/> Productos</h2>
+                                    <span class="text-danger small fw-bold"><span class="fa fa-exclamation-circle me-1"></span>Haga clic para abastecer</span>
+                                </div>
+                                <span class="fa fa-exclamation-triangle text-danger fa-3x bg-light p-3 rounded-circle"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+        </div>
+    </t>
+</templates>

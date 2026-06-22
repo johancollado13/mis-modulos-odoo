@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_ecommerce_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard E-commerce</field>
+        <field name="tag">custom_dashboard.ecommerce_dashboard</field>
+    </record>
+
+    # Menu Raíz Superior en Odoo
+    <menuitem id="menu_dashboard_root" 
+              name="Dashboard Pro" 
+              web_icon="custom_dashboard,static/description/icon.png"
+              sequence="1"/>
+
+    # Sub-menú que ejecuta la acción
+    <menuitem id="menu_ecommerce_dashboard" 
+              name="Resumen de Ventas" 
+              parent="menu_dashboard_root" 
+              action="action_ecommerce_dashboard" 
+              sequence="10"/>
+</odoo>
