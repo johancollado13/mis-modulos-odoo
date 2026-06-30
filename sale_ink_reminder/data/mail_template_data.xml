@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="email_template_ink_reminder" model="mail.template">
+            <field name="name">Ventas: Recordatorio de Renovación de Tinta</field>
+            <field name="model_id" ref="sale.model_sale_order_line"/>
+            <field name="subject">¿Es hora de renovar tus tintas? 🖨️</field>
+            <field name="email_from">{{ object.order_id.company_id.email or object.order_id.user_id.email }}</field>
+            <field name="email_to">{{ object.order_id.partner_id.email }}</field>
+            <field name="lang">{{ object.order_id.partner_id.lang }}</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px;">
+                    <p>Hola <t t-out="object.order_id.partner_id.name"/>,</p>
+                    <p>Hace unas semanas adquiriste tu impresora <strong><a t-attf-href="{{ object.order_id.get_base_url() }}{{ object.product_id.website_url }}#s_dynamic_snippet_1" style="color: #875A7B; text-decoration: underline;"><t t-out="object.product_id.name"/></a></strong> con nosotros. Esperamos que le estés sacando el máximo provecho.</p>
+                    <p>Sabemos que quedarse sin tinta en medio de un trabajo importante es frustrante. Basado en el tiempo estimado de uso (45 días), este podría ser el momento ideal para reponer tus consumibles.</p>
+                    
+                    <p style="margin-top: 24px; font-weight: bold; color: #333333;">Aquí tienes las tintas 100% compatibles con tu equipo:</p>
+                    
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 15px;">
+                        <tr>
+                            <t t-foreach="object.product_id.accessory_product_ids" t-as="acc_product">
+                                <td align="center" valign="top" style="padding: 10px; width: 33%; border: 1px solid #e5e5e5; border-radius: 4px;">
+                                    <img t-attf-src="/web/image/product.template/{{ acc_product.product_tmpl_id.id }}/image_128" style="width: 100px; height: 100px; object-fit: contain;" alt="Imagen del producto"/><br/>
+                                    <span style="font-weight: bold; display: block; margin-top: 8px; height: 36px; overflow: hidden; font-size: 13px;">
+                                        <t t-out="acc_product.name"/>
+                                    </span>
+                                    <span style="color: #00A09D; font-weight: bold; display: block; margin: 5px 0;">
+                                        <t t-out="acc_product.lst_price" t-options="{'widget': 'monetary', 'display_currency': object.order_id.company_id.currency_id}"/>
+                                    </span>
+                                    <a t-attf-href="{{ object.order_id.get_base_url() }}{{ acc_product.website_url }}" 
+                                       style="background-color: #875A7B; padding: 6px 12px; text-decoration: none; color: #fff; border-radius: 3px; font-size: 12px; display: inline-block; margin-top: 5px;">
+                                        Ver producto
+                                    </a>
+                                </td>
+                            </t>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 25px; text-align: center;">
+                        <a t-attf-href="{{ object.order_id.get_base_url() }}{{ object.product_id.website_url }}#s_dynamic_snippet_1" 
+                           style="background-color: #4A5568; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block; font-size: 13px;">
+                            🖨️ Ver consumibles en la página de tu impresora
+                        </a>
+                    </div>
+
+                    <p style="margin-top: 30px;">Si necesitas asistencia adicional o deseas que procesemos tu pedido de forma manual, no dudes en responder a este correo.</p>
+                    <p>Atentamente,<br/><t t-out="object.order_id.company_id.name"/></p>
+                </div>
+            </field>
+        </record>
+
+        <record id="ir_cron_send_ink_reminder_emails" model="ir.cron">
+            <field name="name">Sales: Enviar Recordatorio de Renovación de Tintas (45 días)</field>
+            <field name="model_id" ref="sale.model_sale_order_line"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_send_ink_reminders()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active" eval="True"/>
+            <field name="doall" eval="False"/>
+        </record>
+        
+    </data>
+</odoo>

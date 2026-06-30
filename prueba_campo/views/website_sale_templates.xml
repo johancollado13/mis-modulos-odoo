@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="website_sale_product_activo_custom" inherit_id="website_sale.product">
+        <xpath expr="//h1[@itemprop='name']" position="after">
+            <p t-if="product.activo_custom" class="alert alert-success">
+                Este producto está activo para ventas que pueda verse en el sitio web de Odoo
+            </p>
+        </xpath>
+    </template>
+</odoo>
